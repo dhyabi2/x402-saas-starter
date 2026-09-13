@@ -173,7 +173,7 @@ MIT for the core (this repo). Paid tier bundles ship under MIT for code + restri
 - [smartflowproai.substack.com](https://smartflowproai.substack.com) — weekly x402 observability writing
 - [@tomsmart-ai/mapper-mcp](https://www.npmjs.com/package/@tomsmart-ai/mapper-mcp) — sibling project, x402 endpoint catalog as MCP server
 
-If you're running an x402 catalog and want a paid audit of schema-drift + method-coverage against your data, intake is open week of 02.06 at [smartflowproai.com/work-with-me](https://smartflowproai.com/work-with-me).
+If you are running an x402 catalog and want a paid audit of schema-drift and method-coverage against your data, intake is open at [verify.smartflowproai.com/audit](https://verify.smartflowproai.com/audit/).
 
 ---
 
