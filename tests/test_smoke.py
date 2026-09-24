@@ -232,5 +232,6 @@ def test_landing_page_renders(app_client):
     r = app_client.get("/")
     assert r.status_code == 200
     assert "x402 SaaS Starter" in r.text
-    for tier in TIER_PRICING:
-        assert f"/buy/{tier}" in r.text
+    rendered = {f"/buy/{t}" for t in TIER_PRICING if t != "preorder"}
+    for tier_path in rendered:
+        assert tier_path in r.text

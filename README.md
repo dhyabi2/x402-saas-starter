@@ -151,6 +151,32 @@ For full smoke including post-payment download, see `tests/test_smoke.py` (20+ t
 
 ---
 
+## Nano (XNO) feeless settlement rail
+
+A receive-only Nano (XNO) verification module (`nano_xno.py`) now sits beside the USDC
+x402 path, giving buyers a **feeless, instant settlement option** — no facilitator, no gas,
+no chargeback risk, and no issuer that can freeze funds. The server never holds a private key.
+
+**How it works**
+1. The operator publishes a `nano_` pay-to address (no env var change — configurable via
+   `NANO_PAY_TO` / `NANO_RPC_URL` once integrated).
+2. The buyer sends XNO on the Nano network (~1s soft finality, $0 fee).
+3. `verify_nano_payment(pay_to, required_xno)` checks the settled block over a public
+   keyless RPC — fail-closed, never trusts the client's amount.
+
+**Status:** `nano_xno.py` + 10 tests (9 offline, 1 online) gate the `isValid` result.
+To enable in the `/download` endpoint, call `verify_nano_payment` alongside the existing
+`require_x402_payment(path)`; a Nano-settled download is served the same signed-URL way.
+
+| property | USDC (x402) | Nano (nano:mainnet) |
+|---|---|---|
+| Settlement cost | ~$0.02–0.20 facilitator fee | $0 |
+| Finality | ~2–12 s (Base L1) | ~0.3 s soft ack |
+| Issuer | USDC Centre (stablecoin issuer) | None (no keys to freeze) |
+| Server key needed | No (CDP API key OK) | No (keyless RPC) |
+
+---
+
 ## Tests
 
 ```bash
