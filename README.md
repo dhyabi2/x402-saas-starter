@@ -161,11 +161,21 @@ no chargeback risk, and no issuer that can freeze funds. The server never holds 
 1. The operator publishes a `nano_` pay-to address (no env var change — configurable via
    `NANO_PAY_TO` / `NANO_RPC_URL` once integrated).
 2. The buyer sends XNO on the Nano network (~1s soft finality, $0 fee).
-3. `verify_nano_payment(pay_to, required_xno)` checks the settled block over a public
-   keyless RPC — fail-closed, never trusts the client's amount.
+3. Gate access with `issue_order` + `verify_order_payment`. A Nano block has no memo, so
+   each order gets a random 128-bit id and a commitment
+   (`SHA-256("xno-binding/v1/rep|" + order_id + "|" + pay_to + "|" + price_raw)`); the
+   buyer signs the send block with it as the `representative` (`representative_pubkey` in
+   the order, hex). The verifier requires a confirmed send of exactly the price to
+   `pay_to` carrying that commitment, then claims the block hash one-to-one with the order
+   (sqlite, `UNIQUE(block_hash)` and `UNIQUE(order_id)`, so it survives a restart) before
+   access is granted. Node lookups time out after 10 s, are capped at 64 KB, and a
+   non-loopback `http://` RPC URL is refused. See
+   [xno-call-binding](https://github.com/dhyabi2/xno-call-binding).
+   `verify_nano_payment(pay_to, required_xno)` only reads a block and is **not** bound to an
+   order; do not use it as the access gate.
 
-**Status:** `nano_xno.py` + 10 tests (9 offline, 1 online) gate the `isValid` result.
-To enable in the `/download` endpoint, call `verify_nano_payment` alongside the existing
+**Status:** `nano_xno.py` + 16 tests (15 offline, 1 online).
+To enable in the `/download` endpoint, call `verify_order_payment` alongside the existing
 `require_x402_payment(path)`; a Nano-settled download is served the same signed-URL way.
 
 | property | USDC (x402) | Nano (nano:mainnet) |
